@@ -11,10 +11,7 @@
     <aside class="sidebar">
       <div class="brand">
         <div class="logo">МК</div>
-        <div>
-          <strong>Мебел</strong>
-          <span>по мерка</span>
-        </div>
+        <div><strong>Мебел</strong><span>по мерка</span></div>
       </div>
       <nav>
         <button class="nav-btn active" data-view="new">Нов проект</button>
@@ -25,13 +22,8 @@
     <main>
       <section id="view-new" class="view">
         <header class="topbar">
-          <div>
-            <h1>Нов проект</h1>
-            <p class="muted" id="projLabel">Клиент, па материјал</p>
-          </div>
-          <div class="top-actions">
-            <button class="btn ghost" id="printBtn" type="button">Печати</button>
-          </div>
+          <div><h1>Нов проект</h1><p class="muted" id="projLabel">Клиент, па материјал</p></div>
+          <div class="top-actions"><button class="btn ghost" id="printBtn" type="button">Печати</button></div>
         </header>
         <div class="card">
           <h2>Клиент</h2>
@@ -39,7 +31,7 @@
             <label>Име<input id="clientName" placeholder="Име и презиме" /></label>
             <label>Телефон<input id="clientPhone" placeholder="07x xxx xxx" /></label>
             <label>Место / град<input id="clientCity" placeholder="Скопје" /></label>
-            <label>Напомена<textarea id="clientNote" rows="2" placeholder="Кујна, монтажа..."></textarea></label>
+            <label>Напомена<textarea id="clientNote" rows="2"></textarea></label>
           </div>
         </div>
         <div class="card">
@@ -48,10 +40,7 @@
           <button class="btn" id="addBoardBtn" type="button">+ Додади плоча</button>
         </div>
         <div class="card">
-          <div class="row-between">
-            <h2>Кант</h2>
-            <button class="btn ghost" data-addcat="kant_pvc" type="button">+ Кант</button>
-          </div>
+          <div class="row-between"><h2>Кант</h2><button class="btn ghost" data-addcat="kant_pvc" type="button">+ Кант</button></div>
           <div id="kantRows" class="item-list"></div>
         </div>
         <div class="card">
@@ -65,26 +54,35 @@
           </div>
           <div id="okovRows" class="item-list"></div>
         </div>
-        <div class="card summary-card">
-          <h2>Збир</h2>
-          <div class="totals" id="totalsBox"></div>
-        </div>
+        <div class="card summary-card"><h2>Збир</h2><div class="totals" id="totalsBox"></div></div>
       </section>
       <section id="view-prices" class="view hidden">
         <header class="topbar">
-          <div>
-            <h1>Ценовник</h1>
-            <p class="muted">Групи, измени, зачувај, избриши</p>
-          </div>
+          <div><h1>Ценовник</h1><p class="muted">Скенирај слика или внеси рачно</p></div>
           <button class="btn" id="addPriceBtn" type="button">+ Нова ставка</button>
         </header>
+        <div class="card">
+          <h2>Скенирај ценовник</h2>
+          <div class="row">
+            <label class="btn ghost" for="scanFile">Од галерија / камера</label>
+            <input type="file" id="scanFile" accept="image/*" multiple />
+            <button class="btn" id="scanBtn" type="button">Прочитај слика</button>
+            <button class="btn" id="saveScanBtn" type="button">Зачувај во ценовник</button>
+          </div>
+          <p class="hint" id="scanStatus">Одбери слика од галерија. Шифрите и цените се читаат и оди во група (иверка, кант, ABS...).</p>
+          <div id="scanPreview" class="photo-preview"></div>
+          <div class="table-wrap" style="margin-top:12px">
+            <table>
+              <thead><tr><th></th><th>Шифра</th><th>Име</th><th>Група</th><th>Ед.</th><th>Цена</th></tr></thead>
+              <tbody id="scanBody"></tbody>
+            </table>
+          </div>
+        </div>
         <div class="tabs" id="priceTabs"></div>
         <div class="card">
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr><th>Шифра</th><th>Име</th><th>Ед.</th><th>Цена €</th><th></th></tr>
-              </thead>
+              <thead><tr><th>Шифра</th><th>Име</th><th>Ед.</th><th>Цена €</th><th></th></tr></thead>
               <tbody id="priceBody"></tbody>
             </table>
           </div>
@@ -92,10 +90,7 @@
       </section>
       <section id="view-projects" class="view hidden">
         <header class="topbar">
-          <div>
-            <h1>Проекти</h1>
-            <p class="muted">Сите зачувани</p>
-          </div>
+          <div><h1>Проекти</h1><p class="muted">Сите зачувани</p></div>
           <button class="btn" id="newFromListBtn" type="button">Нов проект</button>
         </header>
         <div id="projectList"></div>
@@ -112,7 +107,9 @@
       </div>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="brio.js"></script>
   <script src="app.js"></script>
+  <script src="scan.js"></script>
 </body>
 </html>
