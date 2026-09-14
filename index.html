@@ -58,22 +58,22 @@
       </section>
       <section id="view-prices" class="view hidden">
         <header class="topbar">
-          <div><h1>Ценовник</h1><p class="muted">Google Gemini чита слика и распоредува ставки</p></div>
+          <div><h1>Ценовник</h1><p class="muted">Клучот се внесува на компјутер, на телефон со линк</p></div>
           <button class="btn" id="addPriceBtn" type="button">+ Нова ставка</button>
         </header>
         <div class="card">
           <h2>Скенирај ценовник со Gemini</h2>
-          <label>Google API клуч
-            <input id="geminiKey" type="password" placeholder="Внеси клуч од aistudio.google.com" autocomplete="off" />
+          <label>Гоогле API клуч (само овде на компјутер)
+            <input id="geminiKey" type="password" placeholder="Клуч од aistudio.google.com" autocomplete="off" />
           </label>
-          <p class="hint">Бесплатен клуч: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> — се чува само на овој телефон/компјутер.</p>
           <div class="row" style="margin-top:10px">
+            <button class="btn ghost" id="shareKeyBtn" type="button">Линк за телефон</button>
             <label class="btn ghost" for="scanFile">Од галерија / камера</label>
             <input type="file" id="scanFile" accept="image/*" multiple style="display:none" />
             <button class="btn" id="scanBtn" type="button">Прочитај со AI</button>
             <button class="btn" id="saveScanBtn" type="button">Зачувај во ценовник</button>
           </div>
-          <p class="hint" id="scanStatus">Стави клуч, одбери слика, потоа Прочитај.</p>
+          <p class="hint" id="scanStatus">На ПЦ внеси клуч → Линк за телефон → отвори го на телефон еднаш.</p>
           <div id="scanPreview"></div>
           <div class="table-wrap" style="margin-top:12px">
             <table>
