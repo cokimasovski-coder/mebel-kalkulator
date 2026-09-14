@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Калкулатор за мебел по мерка</title>
+  <title>Мебел — калкулатор</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,114 +12,93 @@
       <div class="brand">
         <div class="logo">МК</div>
         <div>
-          <strong>Мебел Калкулатор</strong>
-          <span>Шифарник + понуда</span>
+          <strong>Мебел</strong>
+          <span>по мерка</span>
         </div>
       </div>
       <nav>
-        <button class="nav-btn active" data-view="project">Понуда</button>
-        <button class="nav-btn" data-view="catalog">Шифарник / ценовник</button>
-        <button class="nav-btn" data-view="import">Увоз од ценовник</button>
-        <button class="nav-btn" data-view="settings">Подесувања</button>
+        <button class="nav-btn active" data-view="new">Нов проект</button>
+        <button class="nav-btn" data-view="prices">Ценовник</button>
+        <button class="nav-btn" data-view="projects">Проекти</button>
       </nav>
-      <div class="sidebar-note">Ценовник Brio: шифра + дебелина = цена.</div>
     </aside>
     <main>
-      <header class="topbar">
-        <div>
-          <h1 id="viewTitle">Нова понуда</h1>
-          <p id="viewSub">Додавај ставки по шифра и дебелина</p>
-        </div>
-        <div class="top-actions">
-          <select id="projectSelect"></select>
-          <button class="btn ghost" id="newProjectBtn">Нова понуда</button>
-          <button class="btn" id="printBtn">Печати</button>
-        </div>
-      </header>
-      <section id="view-project" class="view">
-        <div class="grid-2">
-          <div class="card">
-            <h2>Податоци за клиент</h2>
-            <div class="form-grid">
-              <label>Име / објект<input id="clientName" /></label>
-              <label>Телефон<input id="clientPhone" /></label>
-              <label>Град / адреса<input id="clientCity" /></label>
-              <label>Рок (денови)<input id="leadTime" type="number" value="21" /></label>
-            </div>
+      <section id="view-new" class="view">
+        <header class="topbar">
+          <div>
+            <h1>Нов проект</h1>
+            <p class="muted" id="projLabel">Клиент, па материјал</p>
           </div>
-          <div class="card"><h2>Резиме</h2><div class="totals" id="totalsBox"></div></div>
+          <div class="top-actions">
+            <button class="btn ghost" id="printBtn" type="button">Печати</button>
+          </div>
+        </header>
+        <div class="card">
+          <h2>Клиент</h2>
+          <div class="form-grid">
+            <label>Име<input id="clientName" placeholder="Име и презиме" /></label>
+            <label>Телефон<input id="clientPhone" placeholder="07x xxx xxx" /></label>
+            <label>Место / град<input id="clientCity" placeholder="Скопје" /></label>
+            <label>Напомена<textarea id="clientNote" rows="2" placeholder="Кујна, монтажа..."></textarea></label>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Материјал — плочи</h2>
+          <div id="boardRows"></div>
+          <button class="btn" id="addBoardBtn" type="button">+ Додади плоча</button>
         </div>
         <div class="card">
           <div class="row-between">
-            <h2>Плочи за проектот</h2>
-            <span class="hint">Иверка + дебелина и број табли</span>
+            <h2>Кант</h2>
+            <button class="btn ghost" data-addcat="kant_pvc" type="button">+ Кант</button>
           </div>
-          <div id="boardRows"></div>
-          <button class="btn" id="addBoardBtn" type="button">+ Додади материјал</button>
+          <div id="kantRows" class="item-list"></div>
         </div>
         <div class="card">
-          <div class="row-between"><h2>Брзо додавање</h2><span class="hint">пр. D123</span></div>
-          <div class="quick-add">
-            <input id="searchInput" placeholder="Шифра D123 / A303" autocomplete="off" />
-            <input id="qtyInput" type="number" step="0.01" value="1" />
-            <select id="qtyUnit"></select>
-            <button class="btn" id="addBtn">Додај</button>
+          <div class="row-between">
+            <h2>Оков</h2>
+            <div class="row">
+              <button class="btn ghost" data-addcat="klizac" type="button">+ Клизач</button>
+              <button class="btn ghost" data-addcat="sarka" type="button">+ Клапшарка</button>
+              <button class="btn ghost" data-addcat="drugo" type="button">+ Друго</button>
+            </div>
           </div>
-          <div id="searchResults" class="search-results hidden"></div>
-          <div class="chips" id="quickChips"></div>
+          <div id="okovRows" class="item-list"></div>
         </div>
-        <div class="card">
-          <div class="row-between"><h2>Ставки</h2><button class="btn ghost" id="addEmptyBtn">Празна ставка</button></div>
-          <div class="table-wrap"><table><thead><tr><th>Кат.</th><th>Шифра</th><th>Опис</th><th>Кол.</th><th>Ед.</th><th>Цена</th><th>Износ</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
+        <div class="card summary-card">
+          <h2>Збир</h2>
+          <div class="totals" id="totalsBox"></div>
         </div>
       </section>
-      <section id="view-catalog" class="view hidden">
+      <section id="view-prices" class="view hidden">
+        <header class="topbar">
+          <div>
+            <h1>Ценовник</h1>
+            <p class="muted">Групи, измени, зачувај, избриши</p>
+          </div>
+          <button class="btn" id="addPriceBtn" type="button">+ Нова ставка</button>
+        </header>
+        <div class="tabs" id="priceTabs"></div>
         <div class="card">
-          <div class="row-between"><h2>Шифарник</h2><button class="btn" id="addCatalogBtn">Нова ставка</button></div>
-          <input id="catalogFilter" class="full" placeholder="Барај D123, 18mm..." />
-          <div class="table-wrap"><table><thead><tr><th>Шифра</th><th>Име</th><th>Категорија</th><th>Ед.</th><th>Цена (€)</th><th></th></tr></thead><tbody id="catalogBody"></tbody></table></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Шифра</th><th>Име</th><th>Ед.</th><th>Цена €</th><th></th></tr>
+              </thead>
+              <tbody id="priceBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
-      <section id="view-import" class="view hidden">
-        <div class="card">
-          <h2>Ценовник од слика / Brio</h2>
-          <div class="form-grid">
-            <label>Фирма<input id="vendorName" value="Brio" /></label>
-            <label>Валута<select id="vendorCurrency"><option value="EUR">EUR</option><option value="MKD">MKD</option></select></label>
+      <section id="view-projects" class="view hidden">
+        <header class="topbar">
+          <div>
+            <h1>Проекти</h1>
+            <p class="muted">Сите зачувани</p>
           </div>
-          <div class="row" style="margin-top:12px;flex-wrap:wrap">
-            <label class="btn ghost" for="pricePhoto">Од галерија</label>
-            <input type="file" id="pricePhoto" accept="image/*" multiple />
-            <button class="btn" id="ocrBtn" type="button">Прочитај слика</button>
-            <button class="btn" id="loadBrioBtn" type="button">Вчитај Brio ценовник</button>
-          </div>
-          <p class="hint">За табели како Brio (групи шифри + една цена) најдобро прати ја сликата овде во чат. В апликацијата веќе е внесен тековниот Brio ценовник.</p>
-          <p id="ocrStatus" class="hint"></p>
-          <div id="photoPreview" class="photo-preview"></div>
-        </div>
-        <div class="card">
-          <div class="row-between"><h2>Предлог ставки</h2><button class="btn" id="saveOcrBtn" type="button">Зачувај обележани</button></div>
-          <div class="table-wrap"><table><thead><tr><th></th><th>Шифра</th><th>Опис</th><th>Кат.</th><th>Ед.</th><th>Цена</th></tr></thead><tbody id="ocrBody"></tbody></table></div>
-          <details style="margin-top:12px"><summary class="hint">Суров текст</summary><textarea id="ocrRaw" rows="8"></textarea><button class="btn ghost" id="reparseBtn" type="button">Парсирај</button></details>
-        </div>
-        <div class="card">
-          <h2>CSV</h2>
-          <textarea id="importText" rows="5"></textarea>
-          <div class="row"><button class="btn" id="importBtn">Увези</button><button class="btn ghost" id="exportCsvBtn">Извези</button></div>
-        </div>
-      </section>
-      <section id="view-settings" class="view hidden">
-        <div class="card">
-          <h2>Подесувања</h2>
-          <div class="form-grid">
-            <label>Отпад (%)<input id="wastePct" type="number" step="0.1" /></label>
-            <label>DDV (%)<input id="vatPct" type="number" step="0.1" /></label>
-            <label>Маржа (%)<input id="marginPct" type="number" step="0.1" /></label>
-            <label>Валута<input id="currency" /></label>
-            <label>Превоз (€)<input id="defaultTransport" type="number" step="0.01" /></label>
-            <label>Монтажа (€)<input id="defaultInstall" type="number" step="0.01" /></label>
-          </div>
-        </div>
+          <button class="btn" id="newFromListBtn" type="button">Нов проект</button>
+        </header>
+        <div id="projectList"></div>
       </section>
     </main>
   </div>
@@ -128,13 +107,12 @@
       <h2 id="modalTitle">Ставка</h2>
       <div class="form-grid" id="modalForm"></div>
       <div class="row right">
-        <button class="btn ghost" id="modalCancel">Откажи</button>
-        <button class="btn" id="modalSave">Зачувај</button>
+        <button class="btn ghost" id="modalCancel" type="button">Откажи</button>
+        <button class="btn" id="modalSave" type="button">Зачувај</button>
       </div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js"></script>
   <script src="brio.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
