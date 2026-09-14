@@ -22,15 +22,13 @@
         <button class="nav-btn" data-view="import">Увоз од ценовник</button>
         <button class="nav-btn" data-view="settings">Подесувања</button>
       </nav>
-      <div class="sidebar-note">
-        Сликај ценовник од кројница / добавувач.
-      </div>
+      <div class="sidebar-note">Ценовник Brio: шифра + дебелина = цена.</div>
     </aside>
     <main>
       <header class="topbar">
         <div>
           <h1 id="viewTitle">Нова понуда</h1>
-          <p id="viewSub">Додавај ставки по шифра, метража или парче</p>
+          <p id="viewSub">Додавај ставки по шифра и дебелина</p>
         </div>
         <div class="top-actions">
           <select id="projectSelect"></select>
@@ -43,7 +41,7 @@
           <div class="card">
             <h2>Податоци за клиент</h2>
             <div class="form-grid">
-              <label>Име / објект<input id="clientName" placeholder="нпр. Кујна" /></label>
+              <label>Име / објект<input id="clientName" /></label>
               <label>Телефон<input id="clientPhone" /></label>
               <label>Град / адреса<input id="clientCity" /></label>
               <label>Рок (денови)<input id="leadTime" type="number" value="21" /></label>
@@ -54,16 +52,15 @@
         <div class="card">
           <div class="row-between">
             <h2>Плочи за проектот</h2>
-            <span class="hint">Иверка / медијапан и колку табли</span>
+            <span class="hint">Иверка + дебелина и број табли</span>
           </div>
           <div id="boardRows"></div>
           <button class="btn" id="addBoardBtn" type="button">+ Додади материјал</button>
-          <p class="hint" style="margin-top:8px">Ако требаат две бои (корпус + врати), додај втор ред.</p>
         </div>
         <div class="card">
-          <div class="row-between"><h2>Брзо додавање</h2><span class="hint">Шифра пр. D123</span></div>
+          <div class="row-between"><h2>Брзо додавање</h2><span class="hint">пр. D123</span></div>
           <div class="quick-add">
-            <input id="searchInput" placeholder="Шифра или име" autocomplete="off" />
+            <input id="searchInput" placeholder="Шифра D123 / A303" autocomplete="off" />
             <input id="qtyInput" type="number" step="0.01" value="1" />
             <select id="qtyUnit"></select>
             <button class="btn" id="addBtn">Додај</button>
@@ -79,35 +76,36 @@
       <section id="view-catalog" class="view hidden">
         <div class="card">
           <div class="row-between"><h2>Шифарник</h2><button class="btn" id="addCatalogBtn">Нова ставка</button></div>
-          <input id="catalogFilter" class="full" placeholder="Барај..." />
+          <input id="catalogFilter" class="full" placeholder="Барај D123, 18mm..." />
           <div class="table-wrap"><table><thead><tr><th>Шифра</th><th>Име</th><th>Категорија</th><th>Ед.</th><th>Цена (€)</th><th></th></tr></thead><tbody id="catalogBody"></tbody></table></div>
         </div>
       </section>
       <section id="view-import" class="view hidden">
         <div class="card">
-          <h2>Слика од ценовник на фирма</h2>
+          <h2>Ценовник од слика / Brio</h2>
           <div class="form-grid">
-            <label>Фирма / добавувач<input id="vendorName" /></label>
+            <label>Фирма<input id="vendorName" value="Brio" /></label>
             <label>Валута<select id="vendorCurrency"><option value="EUR">EUR</option><option value="MKD">MKD</option></select></label>
           </div>
           <div class="row" style="margin-top:12px;flex-wrap:wrap">
             <label class="btn ghost" for="pricePhoto">Од галерија</label>
             <input type="file" id="pricePhoto" accept="image/*" multiple />
-            <button class="btn" id="ocrBtn" type="button">Прочитај ги шифрите од сликата</button>
+            <button class="btn" id="ocrBtn" type="button">Прочитај слика</button>
+            <button class="btn" id="loadBrioBtn" type="button">Вчитај Brio ценовник</button>
           </div>
-          <p class="hint">Одбери готови слики од галерија или фајлови. Може и повеќе наеднаш.</p>
+          <p class="hint">За табели како Brio (групи шифри + една цена) најдобро прати ја сликата овде во чат. В апликацијата веќе е внесен тековниот Brio ценовник.</p>
           <p id="ocrStatus" class="hint"></p>
           <div id="photoPreview" class="photo-preview"></div>
         </div>
         <div class="card">
           <div class="row-between"><h2>Предлог ставки</h2><button class="btn" id="saveOcrBtn" type="button">Зачувај обележани</button></div>
           <div class="table-wrap"><table><thead><tr><th></th><th>Шифра</th><th>Опис</th><th>Кат.</th><th>Ед.</th><th>Цена</th></tr></thead><tbody id="ocrBody"></tbody></table></div>
-          <details style="margin-top:12px"><summary class="hint">Суров текст</summary><textarea id="ocrRaw" rows="8"></textarea><button class="btn ghost" id="reparseBtn" type="button">Парсирај повторно</button></details>
+          <details style="margin-top:12px"><summary class="hint">Суров текст</summary><textarea id="ocrRaw" rows="8"></textarea><button class="btn ghost" id="reparseBtn" type="button">Парсирај</button></details>
         </div>
         <div class="card">
-          <h2>Или увези CSV</h2>
-          <textarea id="importText" rows="6" placeholder="D123, Иверка, iverica, tabla, 55"></textarea>
-          <div class="row"><button class="btn" id="importBtn">Увези</button><button class="btn ghost" id="exportCsvBtn">Извези CSV</button></div>
+          <h2>CSV</h2>
+          <textarea id="importText" rows="5"></textarea>
+          <div class="row"><button class="btn" id="importBtn">Увези</button><button class="btn ghost" id="exportCsvBtn">Извези</button></div>
         </div>
       </section>
       <section id="view-settings" class="view hidden">
@@ -137,5 +135,6 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="app.js"></script>
+  <script src="brio.js"></script>
 </body>
 </html>
