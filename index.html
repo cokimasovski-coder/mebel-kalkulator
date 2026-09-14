@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калкулатор за мебел по мерка</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">МК</div>
+        <div>
+          <strong>Мебел Калкулатор</strong>
+          <span>Шифарник + понуда</span>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-view="project">Понуда</button>
+        <button class="nav-btn" data-view="catalog">Шифарник / ценовник</button>
+        <button class="nav-btn" data-view="import">Увоз од ценовник</button>
+        <button class="nav-btn" data-view="settings">Подесувања</button>
+      </nav>
+      <div class="sidebar-note">
+        Сликај ценовник од кројница / добавувач.
+        Безплатен OCR ги вади шифрите и цените, ти ги потврдуваш, а понудите потоа сметаат по тие цени.
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div>
+          <h1 id="viewTitle">Нова понуда</h1>
+          <p id="viewSub">Додавај ставки по шифра, метража или парче</p>
+        </div>
+        <div class="top-actions">
+          <select id="projectSelect"></select>
+          <button class="btn ghost" id="newProjectBtn">Нова понуда</button>
+          <button class="btn" id="printBtn">Печати</button>
+        </div>
+      </header>
+      <section id="view-project" class="view">
+        <div class="grid-2">
+          <div class="card">
+            <h2>Податоци за клиент</h2>
+            <div class="form-grid">
+              <label>Име / објект<input id="clientName" placeholder="нпр. Кујна" /></label>
+              <label>Телефон<input id="clientPhone" /></label>
+              <label>Град / адреса<input id="clientCity" /></label>
+              <label>Рок (денови)<input id="leadTime" type="number" value="21" /></label>
+            </div>
+          </div>
+          <div class="card"><h2>Резиме</h2><div class="totals" id="totalsBox"></div></div>
+        </div>
+        <div class="card">
+          <div class="row-between"><h2>Брзо додавање</h2><span class="hint">Шифра пр. D123</span></div>
+          <div class="quick-add">
+            <input id="searchInput" placeholder="Шифра или име" autocomplete="off" />
+            <input id="qtyInput" type="number" step="0.01" value="1" />
+            <select id="qtyUnit"></select>
+            <button class="btn" id="addBtn">Додај</button>
+          </div>
+          <div id="searchResults" class="search-results hidden"></div>
+          <div class="chips" id="quickChips"></div>
+        </div>
+        <div class="card">
+          <div class="row-between"><h2>Ставки</h2><button class="btn ghost" id="addEmptyBtn">Празна ставка</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Кат.</th><th>Шифра</th><th>Опис</th><th>Кол.</th><th>Ед.</th><th>Цена</th><th>Износ</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
+        </div>
+      </section>
+      <section id="view-catalog" class="view hidden">
+        <div class="card">
+          <div class="row-between"><h2>Шифарник</h2><button class="btn" id="addCatalogBtn">Нова ставка</button></div>
+          <input id="catalogFilter" class="full" placeholder="Барај..." />
+          <div class="table-wrap"><table><thead><tr><th>Шифра</th><th>Име</th><th>Категорија</th><th>Ед.</th><th>Цена (€)</th><th></th></tr></thead><tbody id="catalogBody"></tbody></table></div>
+        </div>
+      </section>
+      <section id="view-import" class="view hidden">
+        <div class="card">
+          <h2>Слика од ценовник на фирма</h2>
+          <div class="form-grid">
+            <label>Фирма / добавувач<input id="vendorName" /></label>
+            <label>Валута<select id="vendorCurrency"><option value="EUR">EUR</option><option value="MKD">MKD</option></select></label>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <input type="file" id="pricePhoto" accept="image/*" capture="environment" multiple />
+            <button class="btn" id="ocrBtn" type="button">Прочитај ги шифрите од сликата</button>
+          </div>
+          <p id="ocrStatus" class="hint"></p>
+          <div id="photoPreview" class="photo-preview"></div>
+        </div>
+        <div class="card">
+          <div class="row-between"><h2>Предлог ставки</h2><button class="btn" id="saveOcrBtn" type="button">Зачувај обележани</button></div>
+          <div class="table-wrap"><table><thead><tr><th></th><th>Шифра</th><th>Опис</th><th>Кат.</th><th>Ед.</th><th>Цена</th></tr></thead><tbody id="ocrBody"></tbody></table></div>
+          <details style="margin-top:12px"><summary class="hint">Суров текст</summary><textarea id="ocrRaw" rows="8"></textarea><button class="btn ghost" id="reparseBtn" type="button">Парсирај повторно</button></details>
+        </div>
+        <div class="card">
+          <h2>Или увези CSV</h2>
+          <textarea id="importText" rows="6" placeholder="D123, Иверка, iverica, tabla, 55"></textarea>
+          <div class="row"><button class="btn" id="importBtn">Увези</button><button class="btn ghost" id="exportCsvBtn">Извези CSV</button></div>
+        </div>
+      </section>
+      <section id="view-settings" class="view hidden">
+        <div class="card">
+          <h2>Подесувања</h2>
+          <div class="form-grid">
+            <label>Отпад (%)<input id="wastePct" type="number" step="0.1" /></label>
+            <label>DDV (%)<input id="vatPct" type="number" step="0.1" /></label>
+            <label>Маржа (%)<input id="marginPct" type="number" step="0.1" /></label>
+            <label>Валута<input id="currency" /></label>
+            <label>Превоз (€)<input id="defaultTransport" type="number" step="0.01" /></label>
+            <label>Монтажа (€)<input id="defaultInstall" type="number" step="0.01" /></label>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="modalTitle">Ставка</h2>
+      <div class="form-grid" id="modalForm"></div>
+      <div class="row right">
+        <button class="btn ghost" id="modalCancel">Откажи</button>
+        <button class="btn" id="modalSave">Зачувај</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
