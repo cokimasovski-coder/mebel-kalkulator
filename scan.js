@@ -2,13 +2,22 @@ let scanFiles=[], scanRows=[];
 const KEY_STORE="mebel-gemini-key";
 const PROMPT=`Ti si asistent za mebel po merka vo Makedonija.
 Od slikata na cenovnik izvleci site stavki.
-Ako poveke sifri (D123, A303...) delat ista cena i debelina, napravi poseben objekt za SEKOJA sifra.
-Ako istata sifra ima razlicna cena za 8mm/16mm/18mm/25mm, napravi poseben red za sekoja debelina i vo name stavi debelinata.
-Ceni pretvori vo evra. Ako pisuva DEN ili denari, podeli so 61.5.
-cat mora da bide edno od: iverica, medijapan, kant_pvc, kant_abs1, kant_abs2, klizac, sarka, drugo.
-unit mora da bide: tabla, m, kom, komplet.
-Vrati SAMO JSON niza, bez markdown:
-[{"code":"D123","name":"Iverica D123 18mm mat","cat":"iverica","unit":"tabla","price":56}]`;
+Ako poveke sifri delat ista cena, napravi poseben objekt za sekoja sifra.
+Ako ista sifra ima razlicna cena po debelina, poseben red za sekoja debelina.
+Ceni vo evra. DEN podeli so 61.5.
+cat: iverica, medijapan, kant_pvc, kant_abs1, kant_abs2, klizac, sarka, drugo.
+unit: tabla, m, kom, komplet.
+Vrati SAMO JSON niza.`;
+function getKey(){
+  const fromHash=new URLSearchParams((location.hash||"").replace(/^#/,"")).get("gk");
+  if(fromHash){
+    try{const k=decodeURIComponent(fromHash).trim();if(k){localStorage.setItem(KEY_STORE,k);history.replaceState(null,"",location.pathname+location.search);return k;}}catch(e){}
+  }
+  const box=$("geminiKey");
+  const typed=(box&&box.value||"").trim();
+  if(typed){localStorage.setItem(KEY_STORE,typed);return typed;}
+  return (window.MEBEL_GEMINI_KEY||localStorage.getItem(KEY_STORE)||"").trim();
+}
 function guessCatUnit(t){
   t=(t||"").toLowerCase();
   if(/abs/.test(t)&&/2\s*mm|08\/41|08\/28/.test(t))return["kant_abs2","m"];
@@ -31,9 +40,7 @@ function parseScanText(text){
     const without=line.replace(new RegExp(nums[nums.length-1]+".*$"),"").trim();
     const codes=[...without.matchAll(/\b([A-Z]{0,2}\d{2,4}[A-Z]?)\b/gi)].map(m=>m[1].toUpperCase());
     const [cat,unit]=guessCatUnit(line);
-    (codes.length?codes:["R"+String(i+1).padStart(3,"0")]).forEach(code=>{
-      rows.push({id:uid(),keep:true,code,name:without||line,cat,unit,price});
-    });
+    (codes.length?codes:["R"+String(i+1).padStart(3,"0")]).forEach(code=>rows.push({id:uid(),keep:true,code,name:without||line,cat,unit,price}));
   });
   return rows;
 }
@@ -53,12 +60,7 @@ function rowsFromGemini(text){
   })).filter(x=>x.code&&x.price>0);
 }
 function fileToB64(file){
-  return new Promise((resolve,reject)=>{
-    const r=new FileReader();
-    r.onload=()=>resolve(String(r.result).split(",")[1]);
-    r.onerror=reject;
-    r.readAsDataURL(file);
-  });
+  return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]);r.onerror=reject;r.readAsDataURL(file);});
 }
 async function askGemini(file,key){
   const b64=await fileToB64(file);
@@ -72,9 +74,8 @@ async function askGemini(file,key){
     })});
     const data=await res.json();
     if(!res.ok){last=(data.error&&data.error.message)||res.statusText;continue;}
-    const text=(((data.candidates||[])[0]||{}).content||{}).parts||[];
-    const joined=text.map(p=>p.text||"").join("\n");
-    if(joined)return joined;
+    const text=((((data.candidates||[])[0]||{}).content||{}).parts||[]).map(p=>p.text||"").join("\n");
+    if(text)return text;
     last="prazno";
   }
   throw new Error(last||"Gemini ne odgovori");
@@ -87,7 +88,7 @@ function renderScan(){
   body.innerHTML=scanRows.map(r=>`<tr>
     <td><input type="checkbox" data-sk="${r.id}" ${r.keep?"checked":""}></td>
     <td><input data-sf="code" data-id="${r.id}" value="${r.code}"></td>
-    <td><input data-sf="name" data-id="${r.id}" value="${r.name.replace(/"/g,"")}"></td>
+    <td><input data-sf="name" data-id="${r.id}" value="${String(r.name).replace(/"/g,"")}"></td>
     <td><select data-sf="cat" data-id="${r.id}">${catOpts}</select></td>
     <td><select data-sf="unit" data-id="${r.id}">${unitOpts}</select></td>
     <td><input data-sf="price" data-id="${r.id}" type="number" step="0.01" value="${r.price}"></td>
@@ -98,35 +99,23 @@ function renderScan(){
 }
 async function runScan(){
   if(!scanFiles.length){$("scanStatus").textContent="Прво одбери слика.";return;}
-  const key=($("geminiKey").value||"").trim();
-  localStorage.setItem(KEY_STORE,key);
+  const key=getKey();
   scanRows=[];
   try{
     if(key){
       $("scanStatus").textContent="Gemini чита слика...";
       let all=[];
-      for(const f of scanFiles){
-        const text=await askGemini(f,key);
-        all=all.concat(rowsFromGemini(text));
-      }
+      for(const f of scanFiles)all=all.concat(rowsFromGemini(await askGemini(f,key)));
       scanRows=all;
     }else if(window.Tesseract){
-      $("scanStatus").textContent="Нема клуч. Читам со OCR...";
+      $("scanStatus").textContent="Нема клуч. OCR...";
       let all="";
-      for(const f of scanFiles){
-        const res=await Tesseract.recognize(f,"eng").catch(()=>null);
-        all+=(res&&res.data&&res.data.text)||"";
-      }
+      for(const f of scanFiles){const res=await Tesseract.recognize(f,"eng").catch(()=>null);all+=(res&&res.data&&res.data.text)||"";}
       scanRows=parseScanText(all);
-    }else{
-      $("scanStatus").textContent="Стави Google API клуч.";
-      return;
-    }
+    }else{$("scanStatus").textContent="Стави Google API клуч на компјутер.";return;}
     renderScan();
-    $("scanStatus").textContent="Најдени "+scanRows.length+" ставки. Провери и зачувај.";
-  }catch(err){
-    $("scanStatus").textContent="Грешка: "+(err.message||err)+". Провери го клучот.";
-  }
+    $("scanStatus").textContent="Најдени "+scanRows.length+" ставки.";
+  }catch(err){$("scanStatus").textContent="Грешка: "+(err.message||err);}
 }
 function saveScan(){
   let n=0;
@@ -139,9 +128,19 @@ function saveScan(){
   save();renderPrices();
   $("scanStatus").textContent="Зачувани "+n+" ставки.";
 }
+function phoneLink(){
+  const key=getKey();
+  if(!key){alert("Прво внеси го клучот на компјутер.");return;}
+  const url=location.origin+location.pathname+"#gk="+encodeURIComponent(key);
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url);
+  prompt("Отвори го овој линк на телефон (еднаш). Потоа клучот е зачуван таму.",url);
+}
 (function setupScan(){
   const file=$("scanFile"), keyEl=$("geminiKey");
-  if(keyEl){keyEl.value=localStorage.getItem(KEY_STORE)||"";keyEl.oninput=()=>localStorage.setItem(KEY_STORE,keyEl.value.trim());}
+  const existing=getKey();
+  if(keyEl){keyEl.value=existing;keyEl.oninput=()=>localStorage.setItem(KEY_STORE,keyEl.value.trim());}
+  if(existing&&$("scanStatus"))$("scanStatus").textContent="Клучот е спремен. Одбери слика и Прочитај.";
+  if($("shareKeyBtn"))$("shareKeyBtn").onclick=phoneLink;
   if(!file)return;
   file.onchange=e=>{scanFiles=[...e.target.files];$("scanPreview").innerHTML=scanFiles.map(f=>`<img src="${URL.createObjectURL(f)}" style="max-width:220px;border-radius:10px;margin:8px 8px 0 0">`).join("");};
   $("scanBtn").onclick=runScan;
