@@ -43,6 +43,8 @@ input, select, textarea {
 .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
 .btn.danger { background: transparent; color: var(--danger); border: 1px solid #5a3030; }
 .hint { color: var(--muted); font-size: 13px; }
+.board-row { display: grid; grid-template-columns: 1.6fr 130px 110px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+.board-row .price-hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .quick-add { display: grid; grid-template-columns: 1fr 110px 130px auto; gap: 8px; }
 .search-results { position: relative; margin-top: 8px; background: #121816; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .search-item { padding: 8px 10px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; }
@@ -64,11 +66,11 @@ td input, td select { padding: 6px 8px; }
 @media (max-width: 980px) {
   .app { grid-template-columns: 1fr; }
   .sidebar { flex-direction: row; flex-wrap: wrap; }
-  .grid-2, .form-grid, .quick-add { grid-template-columns: 1fr; }
+  .grid-2, .form-grid, .quick-add, .board-row { grid-template-columns: 1fr; }
   nav { flex-direction: row; flex-wrap: wrap; }
 }
 @media print {
-  .sidebar, .top-actions, .quick-add, .chips, #addEmptyBtn, .nav-btn { display: none !important; }
+  .sidebar, .top-actions, .quick-add, .chips, #addEmptyBtn, .nav-btn, #addBoardBtn { display: none !important; }
   .app { display: block; }
   .card { box-shadow: none; break-inside: avoid; }
 }
