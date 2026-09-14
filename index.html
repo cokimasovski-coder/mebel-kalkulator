@@ -90,10 +90,12 @@
             <label>Фирма / добавувач<input id="vendorName" /></label>
             <label>Валута<select id="vendorCurrency"><option value="EUR">EUR</option><option value="MKD">MKD</option></select></label>
           </div>
-          <div class="row" style="margin-top:12px">
-            <input type="file" id="pricePhoto" accept="image/*" capture="environment" multiple />
+          <div class="row" style="margin-top:12px;flex-wrap:wrap">
+            <label class="btn ghost" for="pricePhoto">Од галерија</label>
+            <input type="file" id="pricePhoto" accept="image/*" multiple />
             <button class="btn" id="ocrBtn" type="button">Прочитај ги шифрите од сликата</button>
           </div>
+          <p class="hint">Одбери готови слики од галерија или фајлови. Може и повеќе наеднаш.</p>
           <p id="ocrStatus" class="hint"></p>
           <div id="photoPreview" class="photo-preview"></div>
         </div>
